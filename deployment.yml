@@ -1,0 +1,51 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cloud-design-dev-deploy
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: cloud-design-dev
+    spec:
+      containers:
+      - name: cloud-design-dev
+        image: us.icr.io/rtiffany/cloud-design-dev:2
+        ports:
+        - containerPort: 80        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-design-dev-service
+  labels:
+    app: cloud-design-dev
+spec:
+  selector:
+    app: cloud-design-dev
+  ports:
+   - protocol: TCP
+     port: 80
+---     
+ apiVersion: extensions/v1beta1
+ kind: Ingress
+ metadata:
+   name: cloud-design-dev-ingress
+ spec:
+   tls:
+   - hosts:
+     - www.cloud-design.dev
+     secretName: wwwcloud-design-dev-cert
+   rules:
+   - host: www.cloud-design.dev
+     http:
+       paths:
+       - path: /
+         backend:
+           serviceName: cloud-design-dev-service
+           servicePort: 80
+
+
+
+
